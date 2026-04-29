@@ -16,22 +16,24 @@ This repository contains a complete experimental pipeline for auditing how LLMs 
 - **Deployable false-positive rate:** 3% FPR on natural typos at 95% recall.
 ## 🚀 Latest Breakthrough: Game‑Theoretic Coalition Audit
 
-After finding that standard unlearning and steering interventions fail to genuinely
-erase the typosquatting concept, we applied **Cooperative Game Theory** to the
-orthogonal probe directions.
+After finding that standard unlearning and steering interventions often fail to genuinely
+erase the typosquatting concept, we applied **Cooperative Game Theory** to the model's
+orthogonal probe subspace.
 
-Using **Shapley Values and Banzhaf Power Indices**, we discovered:
+Using iterative orthogonal depletion, we extracted 30 concept directions and applied
+**Shapley Values and Banzhaf Power Indices**, identifying a structural bifurcation:
 
-- **The “Swing Voter” (Shape):** A single dominant direction accounts for 92% of the
-  classification signal. Standard unlearning only collapses this axis.
-- **The “Backup Coalition” (Shadow):** The remaining 29 directions form a highly
-  redundant backup coalition – each has near‑zero Shapley value, but retains full
-  capacity to classify.
+*   **The “Swing Voter” (Shape):** A single dominant direction accounts for 92% of the
+    classification signal. Standard unlearning only collapses this axis.
+*   **The “Backup Coalition” (Shadow):** The remaining 29 directions form a highly
+    redundant backup coalition. While they possess near‑zero Shapley value in the base
+    model, they retain full latent capacity to classify the anomaly.
 
-This explains why “unlearned” concepts can be easily recovered.
+**Conclusion:** Unlearning often induces “representational suppression” rather than
+“erasure.”
 
-See [`12_game_theoretic_audit.ipynb`](notebooks/12_game_theoretic_audit.ipynb) for the
-full Shapley/Banzhaf implementation and phase‑transition plots.
+*(See `12_game_theoretic_audit.ipynb` for the full phase‑transition analysis. Future work
+will scale this audit using Randomized NLA and Subspace Recycling.)*
 
 ## Repository Structure
 
