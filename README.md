@@ -42,6 +42,14 @@ full Shapley/Banzhaf implementation and phase‑transition plots.
 | `results/` | Figures and tables from all experiments |
 | `src/` | Reusable Python modules for data generation, probing, and interventions |
 
+## Repository Roadmap
+| Notebook | Research Phase | Focus |
+| :--- | :--- | :--- |
+| `01-02` | **Dataset & Baseline** | Benchmark generation & linear probe training. |
+| `04-07` | **Safety Interventions** | Fine-tuning, steering, and contrastive erasure. |
+| `05-06` | **Subspace Analysis** | Iterative depletion of orthogonal probe directions. |
+| `12` | **Game-Theoretic Audit** | **[Canonical Analysis]** Shapley/Banzhaf coalition audit. |
+
 ## Quick Start
 
 1. **Clone the repository:**
