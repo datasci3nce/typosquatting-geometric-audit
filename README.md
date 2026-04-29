@@ -1,4 +1,4 @@
-# Typosquatting Geometric Audit
+﻿# Typosquatting Geometric Audit
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
@@ -14,6 +14,24 @@ This repository contains a complete experimental pipeline for auditing how LLMs 
 - **Layer-wise ablation collapses detection:** Removing any single transformer layer's output drops AUC to chance (0.5), revealing that the representation is **compositionally encoded across all 28 layers**.
 - **Subspace dimensionality ≥ 30:** Multi-direction depletion requires 30+ orthogonal projections to reduce AUC below 0.75.
 - **Deployable false-positive rate:** 3% FPR on natural typos at 95% recall.
+## 🚀 Latest Breakthrough: Game‑Theoretic Coalition Audit
+
+After finding that standard unlearning and steering interventions fail to genuinely
+erase the typosquatting concept, we applied **Cooperative Game Theory** to the
+orthogonal probe directions.
+
+Using **Shapley Values and Banzhaf Power Indices**, we discovered:
+
+- **The “Swing Voter” (Shape):** A single dominant direction accounts for 92% of the
+  classification signal. Standard unlearning only collapses this axis.
+- **The “Backup Coalition” (Shadow):** The remaining 29 directions form a highly
+  redundant backup coalition – each has near‑zero Shapley value, but retains full
+  capacity to classify.
+
+This explains why “unlearned” concepts can be easily recovered.
+
+See [`12_game_theoretic_audit.ipynb`](notebooks/12_game_theoretic_audit.ipynb) for the
+full Shapley/Banzhaf implementation and phase‑transition plots.
 
 ## Repository Structure
 
