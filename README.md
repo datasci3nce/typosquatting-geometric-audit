@@ -1,60 +1,65 @@
-﻿# Typosquatting Geometric Audit
+# Typosquatting Geometric Audit: Representational Redundancy in LLMs
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 
-A mechanistic interpretability study of typosquatting detection in Qwen-2.5-1.5B, motivated by the router-mediated AC-1.a attack in [*Your Agent Is Mine*](https://arxiv.org/abs/2604.08407).
+This repository contains a mechanistic and game-theoretic audit of how LLMs internally represent router-mediated typosquatting vulnerabilities (the AC-1.a attack surface, as described in [*Your Agent Is Mine*](https://arxiv.org/abs/2604.08407)).
 
-## Overview
+## Research Narrative: Shape vs. Shadow
 
-This repository contains a complete experimental pipeline for auditing how LLMs internally represent typosquatted package names. Key findings:
+Standard safety interventions (fine-tuning, steering) often demonstrate "behavioral compliance" while retaining latent access to hazardous knowledge. Our investigation reveals that this brittleness stems from a structural redundancy in the model's internal representations.
 
-- **Detection is near-perfect:** Linear probes achieve AUC = 0.9985 on adversarial package names.
-- **Interventions fail to erase the signal:** Correction fine-tuning, activation steering, projection depletion, and contrastive learning all leave the subspace intact.
-- **Layer-wise ablation collapses detection:** Removing any single transformer layer's output drops AUC to chance (0.5), revealing that the representation is **compositionally encoded across all 28 layers**.
-- **Subspace dimensionality ≥ 30:** Multi-direction depletion requires 30+ orthogonal projections to reduce AUC below 0.75.
-- **Deployable false-positive rate:** 3% FPR on natural typos at 95% recall.
-## 🚀 Latest Breakthrough: Game‑Theoretic Coalition Audit
+**Key Findings:**
+* **Distributed Encoding:** The anomaly representation is distributed across *all* 28 transformer layers; ablating any single layer collapses detection, indicating a highly synergistic structure.
+* **Structural Bifurcation:** Using orthogonal subspace depletion, we identified 30 directions spanning the concept subspace. Applying cooperative game theory (Shapley Values, Banzhaf Power Indices) reveals a clear structural divide:
+    * **The “Swing Voter” (Shape):** A single direction captures **81.1% ± 5.3%** of the classification signal.
+    * **The “Backup Coalition” (Shadow):** The remaining 29 directions have near-zero individual importance but *collectively* retain a **0.628 ± 0.013 AUC**, a statistically significant residual signal.
 
-After finding that standard unlearning and steering interventions often fail to genuinely
-erase the typosquatting concept, we applied **Cooperative Game Theory** to the model's
-orthogonal probe subspace.
+**Conclusion:** Unlearning often induces "representational suppression" rather than genuine erasure. The backup coalition survives interventions, preserving the relational topology of the hazardous concept in a latent state. This provides a structural explanation for the brittleness of machine unlearning.
 
-Using iterative orthogonal depletion, we extracted 30 concept directions and applied
-**Shapley Values and Banzhaf Power Indices**, identifying a structural bifurcation:
+## Key Result
 
-*   **The “Swing Voter” (Shape):** A single dominant direction accounts for 92% of the
-    classification signal. Standard unlearning only collapses this axis.
-*   **The “Backup Coalition” (Shadow):** The remaining 29 directions form a highly
-    redundant backup coalition. While they possess near‑zero Shapley value in the base
-    model, they retain full latent capacity to classify the anomaly.
+The core finding of this audit is the measurable redundancy in the model's internal representation.
 
-**Conclusion:** Unlearning often induces “representational suppression” rather than
-“erasure.”
+| Metric | Value |
+| :--- | :--- |
+| **Dominant Direction Shapley Fraction** | **0.8108 ± 0.0527** |
+| **Backup Coalition AUC (directions 1‑29)** | **0.6282 ± 0.0126** |
+| **Full 30‑Direction Probe AUC** | **0.9820 ± 0.0031** |
 
-*(See `12_game_theoretic_audit.ipynb` for the full phase‑transition analysis. Future work
-will scale this audit using Randomized NLA and Subspace Recycling.)*
-
-## Repository Structure
-
-| Path | Description |
-|------|-------------|
-| `data/` | Full dataset (3,214 JSONL entries) and dataset card |
-| `notebooks/` | 11 Colab notebooks reproducing each experiment |
-| `results/` | Figures and tables from all experiments |
-| `src/` | Reusable Python modules for data generation, probing, and interventions |
+These numbers, calculated across three random seeds (42, 100, 2026), empirically demonstrate a structural bifurcation: a single "Shape" carries most of the causal signal, but a redundant "Shadow" coalition survives intact.
 
 ## Repository Roadmap
+
 | Notebook | Research Phase | Focus |
 | :--- | :--- | :--- |
-| `01-02` | **Dataset & Baseline** | Benchmark generation & linear probe training. |
+| `01-02` | **Baseline & Probing** | Dataset generation & linear probe training. |
 | `04-07` | **Safety Interventions** | Fine-tuning, steering, and contrastive erasure. |
 | `05-06` | **Subspace Analysis** | Iterative depletion of orthogonal probe directions. |
-| `12` | **Game-Theoretic Audit** | **[Canonical Analysis]** Shapley/Banzhaf coalition audit. |
+| `12` | **Game-Theoretic Audit** | **[Canonical Analysis]** Multi-seed Shapley/Banzhaf coalition audit. |
 
-## Quick Start
+## Reproducibility
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/datasci3nce/typosquatting-geometric-audit.git
-   cd typosquatting-geometric-audit
+*   **Dataset:** The `data/` folder contains a sample of the full dataset. The complete 3,214 typosquatted sequences can be regenerated using `notebooks/01_dataset_generation.ipynb`.
+*   **Dependencies:** All required packages (`torch`, `transformers`, `scikit-learn`, etc.) can be installed via `pip install -r requirements.txt`.
+*   **Results:** All figures and tables used in the analysis are available in the `results/` folder.
+
+## Causal Verification & Future Work
+
+This audit demonstrates that interpretability must move beyond individual feature attribution. Future work will:
+1.  **Scale via RandNLA:** Use randomized numerical linear algebra (RandNLA) and subspace recycling to track coalitional importance in 10B+ models, bypassing the exponential cost of exact audit.
+2.  **Certification:** Develop the "Effective Banzhaf Dimension" as a formal metric to certify whether safety interventions have genuinely dismantled an internal concept or merely pushed it into a latent backup coalition.
+
+## Citation
+
+If you use this code or findings in your research, please cite:
+
+```bibtex
+@misc{mariappan2026backupcoalition,
+  author = {Kishore Kumar Mariappan},
+  title = {The Backup Coalition: Game‑Theoretic Audit of Representational Redundancy in LLMs},
+  year = {2026},
+  publisher = {GitHub},
+  journal = {GitHub Repository},
+  howpublished = {\url{https://github.com/datasci3nce/typosquatting-geometric-audit}}
+}
